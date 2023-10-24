@@ -5,10 +5,13 @@ import { Photo } from "../icons/Photo";
 import { firestore, storage } from "@/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addDoc, collection } from "@firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+
 import { useRouter } from "next/navigation";
 
 export default function New() {
   // 새로운 feed를 생성
+  const [url, setUrl] = useState("");
   const [value, setValue] = useState();
   const router = useRouter();
 
@@ -35,23 +38,31 @@ export default function New() {
           id="content"
           className="w-[400px] h-[400px] flex justify-center items-center"
         >
-          {/* <input
-            id="file-upload"
-            type="file"
-            style={{ display: "none" }}
-            value={file}
-            onChange={async (e) => {}}
-          />
-          <label htmlFor="file-upload" className="cursor-pointer">
-            <Photo />
-          </label> */}
-          <img
-            className="object-cover	w-[400px] h-[400px]"
-            src={
-              "https://assets.editorial.aetnd.com/uploads/2009/10/christmas-trees-gettyimages-1072744106.jpg"
-            }
-            alt="img"
-          />
+          {url ? (
+            <img
+              className="object-cover	w-[400px] h-[400px]"
+              src={url}
+              alt="img"
+            />
+          ) : (
+            <>
+              <input
+                id="file-upload"
+                type="file"
+                style={{ display: "none" }}
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  const generatedId = uuidv4();
+                  await uploadBytes(ref(storage, generatedId), file);
+                  const url = await getDownloadURL(ref(storage, generatedId));
+                  setUrl(url);
+                }}
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <Photo />
+              </label>
+            </>
+          )}
         </div>
 
         <div id="comments" className="p-2">
@@ -68,7 +79,6 @@ export default function New() {
        bg-[url(https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/768px-Instagram-Icon.png)]
        bg-cover shadow-xl"
         onClick={async () => {
-          console.log("called");
           try {
             const docRef = await addDoc(collection(firestore, "feeds"), {
               id: "xxxx",
@@ -79,8 +89,7 @@ export default function New() {
                   "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
               },
               location: "seoul",
-              image:
-                "https://cdn.britannica.com/38/196638-131-7BF02881/Santa-Claus.jpg",
+              image: url,
               text: value,
               liked: [],
             });
