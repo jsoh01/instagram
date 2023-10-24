@@ -1,15 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { Feed } from "./components/Feed";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { collection, getDocs } from "@firebase/firestore";
 import { firestore } from "@/firebase";
-
-// 새로운 이미지를 올리는 화면
-// feeds 다른사람들의 피드를 보는 화면
-// my 내 정보화면
 
 export default function Home() {
   const [contents, setContents] = useState([]);
@@ -21,7 +16,6 @@ export default function Home() {
 
   const fetchFeeds = async () => {
     const snapShot = await getDocs(collection(firestore, "feeds"));
-    console.log({ snapShot });
     const nextContents = [];
     snapShot.forEach((doc) => nextContents.push(doc.data()));
     setContents(nextContents);
