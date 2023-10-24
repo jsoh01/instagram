@@ -5,10 +5,12 @@ import { Photo } from "../icons/Photo";
 import { firestore, storage } from "@/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addDoc, collection } from "@firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function New() {
   // 새로운 feed를 생성
   const [value, setValue] = useState();
+  const router = useRouter();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -83,6 +85,7 @@ export default function New() {
               liked: [],
             });
             console.log(docRef);
+            router.push("/");
           } catch (error) {
             console.error(error);
           }
