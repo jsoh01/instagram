@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { Photo } from "../icons/Photo";
-import { firestore, storage } from "@/firebase";
+import { firestore, storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addDoc, collection } from "@firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 import { useRouter } from "next/navigation";
+import { useAuth } from "../store/useAuth";
 
 export default function New() {
   // 새로운 feed를 생성
   const [url, setUrl] = useState("");
   const [value, setValue] = useState();
   const router = useRouter();
+  const { user } = useAuth();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -27,7 +29,7 @@ export default function New() {
               bg-contain mr-2`}
             />
             <div>
-              <div className="font-semibold">작성자</div>
+              <div className="font-semibold">{user.name}</div>
               <div className="font-light">위치</div>
             </div>
           </div>
@@ -85,10 +87,10 @@ export default function New() {
         onClick={async () => {
           try {
             const docRef = await addDoc(collection(firestore, "feeds"), {
-              id: "xxxx",
+              id: uuidv4(),
               author: {
-                id: "awnklfneawe",
-                name: "frogman",
+                id: user.id,
+                name: user.name,
                 profileImg:
                   "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
               },

@@ -3,16 +3,20 @@
 import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
 import { addDoc, collection, where, getDocs, query } from "@firebase/firestore";
-import { firestore } from "@/firebase";
+import { firestore } from "../../firebase";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../store/useAuth";
 
 export default function Auth() {
   const [isLoginMode, setLoginMode] = useState(true);
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
   const [pwConfirm, setPwConfirm] = useState("");
+  const { signIn } = useAuth();
   const router = useRouter();
 
+  const { user } = useAuth();
+  console.log({ user });
   return (
     <main className="flex min-h-screen flex-col items-center  p-24">
       <div>
@@ -60,6 +64,7 @@ export default function Auth() {
             }
 
             window.alert("로그인에 성공했습니다.");
+            signIn(targetUser);
             localStorage.setItem("user", JSON.stringify(targetUser));
             router.push("/");
             return;
@@ -92,7 +97,7 @@ export default function Auth() {
           };
           await addDoc(collection(firestore, "users"), newUser);
           localStorage.setItem("user", JSON.stringify(newUser));
-          console.log(newUser);
+          signIn(useUser);
           window.alert("회원가입에 완료했습니다");
           router.push("/");
         }}
