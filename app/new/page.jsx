@@ -10,12 +10,27 @@ import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../store/useAuth";
 
+import Link from "next/link";
+
 export default function New() {
   // 새로운 feed를 생성
   const [url, setUrl] = useState("");
   const [value, setValue] = useState();
   const router = useRouter();
   const { user } = useAuth();
+
+  if (!user)
+    return (
+      <div>
+        <Link href={"/auth"}> 로그인 </Link>을 해주세요
+      </div>
+    );
+
+  console.log({ profile: user.profileImg });
+
+  const backgroundImage =
+    user.profileImg ||
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -25,9 +40,10 @@ export default function New() {
           <div className="flex items-center ">
             <div
               className={`rounded-full w-10 h-10
-              bg-[url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png')]
               bg-contain mr-2`}
-            />
+            >
+              <img className={`rounded-full w-10 h-10`} src={backgroundImage} />
+            </div>
             <div>
               <div className="font-semibold">{user.name}</div>
               <div className="font-light">위치</div>
@@ -88,12 +104,7 @@ export default function New() {
           try {
             const docRef = await addDoc(collection(firestore, "feeds"), {
               id: uuidv4(),
-              author: {
-                id: user.id,
-                name: user.name,
-                profileImg:
-                  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-              },
+              author: user,
               location: "seoul",
               image: url,
               text: value,

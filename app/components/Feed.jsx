@@ -26,6 +26,10 @@ import { Menu } from "../icons/Menu";
  */
 
 export const Feed = ({ content }) => {
+  const backgroundImage =
+    content.author.profileImg ||
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+
   return (
     <div className="w-[400px] bg-white mb-1">
       <div id="header" className="flex items-center justify-between p-2">
@@ -33,9 +37,10 @@ export const Feed = ({ content }) => {
         <div className="flex items-center ">
           <div
             className={`rounded-full w-10 h-10
-            bg-[url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png')]
-           bg-contain mr-2`}
-          />
+              bg-contain mr-2`}
+          >
+            <img className={`rounded-full w-10 h-10`} src={backgroundImage} />
+          </div>
           <div>
             <div className="font-semibold">{content.author.name}</div>
             <div className="font-light">{content.location}</div>
