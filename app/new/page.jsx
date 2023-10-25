@@ -27,8 +27,8 @@ export default function New() {
               bg-contain mr-2`}
             />
             <div>
-              <div className="font-semibold">{"작성자"}</div>
-              <div className="font-light">{"위치"}</div>
+              <div className="font-semibold">작성자</div>
+              <div className="font-light">위치</div>
             </div>
           </div>
           {/* 더보기 버튼 */}
@@ -51,11 +51,15 @@ export default function New() {
                 type="file"
                 style={{ display: "none" }}
                 onChange={async (e) => {
-                  const file = e.target.files[0];
-                  const generatedId = uuidv4();
-                  await uploadBytes(ref(storage, generatedId), file);
-                  const url = await getDownloadURL(ref(storage, generatedId));
-                  setUrl(url);
+                  try {
+                    const file = e.target.files[0];
+                    const generatedId = uuidv4();
+                    await uploadBytes(ref(storage, generatedId), file);
+                    const url = await getDownloadURL(ref(storage, generatedId));
+                    setUrl(url);
+                  } catch (error) {
+                    console.error(error);
+                  }
                 }}
               />
               <label htmlFor="file-upload" className="cursor-pointer">
@@ -93,8 +97,8 @@ export default function New() {
               text: value,
               liked: [],
             });
-            console.log(docRef);
-            router.push("/");
+            console.log(docRef); // undefined
+            router.push("/"); //
           } catch (error) {
             console.error(error);
           }

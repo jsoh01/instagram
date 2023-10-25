@@ -12,6 +12,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchFeeds();
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    console.log({ loggedInUser });
   }, []);
 
   const fetchFeeds = async () => {
@@ -25,8 +27,8 @@ export default function Home() {
     <>
       <h1> MAIN</h1>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        {contents.map((content) => (
-          <Feed key={content.id} content={content} />
+        {contents.map((content, index) => (
+          <Feed key={index} content={content} />
         ))}
       </main>
       <button
