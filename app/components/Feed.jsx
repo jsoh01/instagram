@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { firestore } from "../../firebase";
 import { BookMark } from "../icons/BookMark";
-import { Chat } from "../icons/Chat";
+import { Comment } from "../icons/Comment";
 import { DM } from "../icons/DM";
 import { Heart } from "../icons/Heart";
 import { Menu } from "../icons/Menu";
@@ -16,6 +19,14 @@ import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
  */
 
 /**
+ * Comment
+ * {
+ *   id: string;
+ *   text: string
+ *   author: User
+ * }
+ */
+/**
  * Content
  * {
  *   id: string;
@@ -24,10 +35,17 @@ import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
  *   image: string;
  *   text: string;
  *   liked: User.id[]
+ *   comments:
  * }
  */
 
-export const Feed = ({ loggedInUser, content }) => {
+export const Feed = ({
+  loggedInUser,
+  content,
+  onUpdateContents,
+  onAddComment,
+}) => {
+  const [commentInputVisible, setCommentInputVisible] = useState(false);
   const backgroundImage =
     content.author.profileImg ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -39,10 +57,16 @@ export const Feed = ({ loggedInUser, content }) => {
     const nextLiked = likedContent
       ? arrayRemove(loggedInUser.id)
       : arrayUnion(loggedInUser.id);
-    const docRef = await updateDoc(doc(firestore, "feeds", content.id), {
+    await updateDoc(doc(firestore, "feeds", content.id), {
       liked: nextLiked,
     });
-    console.log(docRef);
+    const nextContent = {
+      ...content,
+      liked: likedContent
+        ? content.liked.filter((id) => id !== loggedInUser.id)
+        : [...content.liked, loggedInUser.id],
+    };
+    onUpdateContents(nextContent);
   };
 
   return (
@@ -68,6 +92,7 @@ export const Feed = ({ loggedInUser, content }) => {
       </div>
       <div id="content" className="w-[400px] h-[400px]">
         <img
+          onDoubleClick={updateHeartButtonClick}
           className="object-cover	w-[400px] h-[400px]"
           src={content.image}
           alt="img"
@@ -78,7 +103,9 @@ export const Feed = ({ loggedInUser, content }) => {
           <button onClick={updateHeartButtonClick}>
             <Heart color={likedContent ? "red" : null} />
           </button>
-          <Chat />
+          <button onClick={() => setCommentInputVisible(!commentInputVisible)}>
+            <Comment />
+          </button>
           <DM />
         </div>
         <div>
@@ -94,8 +121,28 @@ export const Feed = ({ loggedInUser, content }) => {
           <b>{content.author.name}</b> {content.text}
         </div>
         {/* 내가 작성한 컨텐츠의 글 */}
-        {/* 댓글들 */}
+        {(content.comments || []).map((comment) => (
+          <div key={comment.id}>
+            <b>{comment.author.name}</b> {comment.text}
+          </div>
+        ))}
       </div>
+      {commentInputVisible && (
+        <div className="p-2">
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const comment = e.target[0].value;
+              if (!comment) return;
+              await onAddComment(content, comment);
+              e.target[0].value = "";
+              setCommentInputVisible(false);
+            }}
+          >
+            <b>{loggedInUser.name}</b> <input />
+          </form>
+        </div>
+      )}
     </div>
   );
 };

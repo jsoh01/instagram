@@ -1,9 +1,10 @@
 "use client";
+import { v4 as uuidv4 } from "uuid";
 
 import { Feed } from "./components/Feed";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, getDocs } from "@firebase/firestore";
+import { collection, getDocs, setDoc, doc } from "@firebase/firestore";
 import { firestore } from "../firebase";
 import { useAuth } from "./store/useAuth";
 
@@ -16,10 +17,44 @@ export default function Home() {
     fetchFeeds();
   }, []);
 
+  const onUpdateContents = (nextContent) => {
+    const nextContents = contents.map((content) =>
+      content.id === nextContent.id ? { ...content, ...nextContent } : content
+    );
+    setContents(nextContents);
+  };
+
+  const onAddComment = async (targetContent, comment) => {
+    const id = uuidv4();
+    const commentDoc = {
+      id,
+      text: comment,
+      author: user,
+    };
+    await setDoc(
+      doc(firestore, "feeds", targetContent.id, "comments", id),
+      commentDoc
+    );
+    const nextContent = {
+      ...targetContent,
+      comments: [...targetContent.comments, commentDoc],
+    };
+    onUpdateContents(nextContent);
+  };
+
   const fetchFeeds = async () => {
     const snapShot = await getDocs(collection(firestore, "feeds"));
     const nextContents = [];
-    snapShot.forEach((doc) => nextContents.push(doc.data()));
+    snapShot.forEach(async (doc) => {
+      const res = doc.data();
+      // res.comments = [];
+      // const commentsRef = await getDocs(
+      //   collection(firestore, "feeds", doc.id, "comments")
+      // );
+      // commentsRef.forEach((doc) => res.comments.push(doc.data()));
+      console.log({ res });
+      nextContents.push(res);
+    });
     setContents(nextContents);
   };
 
@@ -27,7 +62,13 @@ export default function Home() {
     <>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         {contents.map((content, index) => (
-          <Feed key={index} content={content} loggedInUser={user} />
+          <Feed
+            key={index}
+            content={content}
+            loggedInUser={user}
+            onUpdateContents={onUpdateContents}
+            onAddComment={onAddComment}
+          />
         ))}
       </main>
       <button
