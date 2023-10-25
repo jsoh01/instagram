@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Photo } from "../icons/Photo";
 import { firestore, storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { addDoc, collection } from "@firebase/firestore";
+import { setDoc, doc, collection } from "@firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -108,8 +109,9 @@ export default function New() {
        bg-cover shadow-xl"
         onClick={async () => {
           try {
-            const docRef = await addDoc(collection(firestore, "feeds"), {
-              id: uuidv4(),
+            const docId = uuidv4();
+            const docRef = await setDoc(doc(firestore, "feeds", docId), {
+              id: docId,
               author: user,
               location,
               image: url,

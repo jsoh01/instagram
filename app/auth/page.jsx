@@ -2,7 +2,14 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
-import { addDoc, collection, where, getDocs, query } from "@firebase/firestore";
+import {
+  setDoc,
+  doc,
+  collection,
+  where,
+  getDocs,
+  query,
+} from "@firebase/firestore";
 import { auth, firestore } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../store/useAuth";
@@ -103,13 +110,13 @@ export default function Auth() {
             );
             return;
           }
-
+          const docId = uuidv4();
           const newUser = {
-            id: uuidv4(),
+            id: docId,
             name: id,
             pw,
           };
-          await addDoc(collection(firestore, "users"), newUser);
+          await setDoc(doc(firestore, "users", docId), newUser);
           localStorage.setItem("user", JSON.stringify(newUser));
           signIn(useUser);
           window.alert("회원가입에 완료했습니다");

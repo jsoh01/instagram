@@ -27,7 +27,7 @@ export default function Home() {
     <>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         {contents.map((content, index) => (
-          <Feed key={index} content={content} />
+          <Feed key={index} content={content} loggedInUser={user} />
         ))}
       </main>
       <button

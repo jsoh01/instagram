@@ -1,8 +1,10 @@
+import { firestore } from "../../firebase";
 import { BookMark } from "../icons/BookMark";
 import { Chat } from "../icons/Chat";
 import { DM } from "../icons/DM";
 import { Heart } from "../icons/Heart";
 import { Menu } from "../icons/Menu";
+import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
 
 /**
  * User
@@ -21,14 +23,27 @@ import { Menu } from "../icons/Menu";
  *   location: string;
  *   image: string;
  *   text: string;
- *   liked: User[]
+ *   liked: User.id[]
  * }
  */
 
-export const Feed = ({ content }) => {
+export const Feed = ({ loggedInUser, content }) => {
   const backgroundImage =
     content.author.profileImg ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+  const likedContent = (content.liked || []).some(
+    (id) => loggedInUser.id === id
+  );
+
+  const updateHeartButtonClick = async () => {
+    const nextLiked = likedContent
+      ? arrayRemove(loggedInUser.id)
+      : arrayUnion(loggedInUser.id);
+    const docRef = await updateDoc(doc(firestore, "feeds", content.id), {
+      liked: nextLiked,
+    });
+    console.log(docRef);
+  };
 
   return (
     <div className="w-[400px] bg-white mb-1">
@@ -60,7 +75,9 @@ export const Feed = ({ content }) => {
       </div>
       <div id="footer" className="flex items-center justify-between p-2">
         <div className="flex items-center w-1/4 justify-between">
-          <Heart />
+          <button onClick={updateHeartButtonClick}>
+            <Heart color={likedContent ? "red" : null} />
+          </button>
           <Chat />
           <DM />
         </div>
