@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Photo } from "../icons/Photo";
+import { Photo } from "../../components/icons/Photo";
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 import { useRouter } from "next/navigation";
-import { useAuth } from "../store/useAuth";
+import { useAuth } from "../../store/useAuth";
 
 import Link from "next/link";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { useContents } from "../store/useContents";
+import { useContents } from "../../store/useContents";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

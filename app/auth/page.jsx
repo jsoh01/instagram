@@ -12,7 +12,7 @@ import {
 } from "@firebase/firestore";
 import { auth, firestore } from "../../firebase";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../store/useAuth";
+import { useAuth } from "../../store/useAuth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 export default function Auth() {

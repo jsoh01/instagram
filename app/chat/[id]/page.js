@@ -3,18 +3,14 @@ import { v4 as uuidv4 } from "uuid";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  where,
-  query,
   collection,
-  getDocs,
-  setDoc,
   addDoc,
   doc,
   getDoc,
   onSnapshot,
 } from "@firebase/firestore";
 import { firestore } from "@/firebase";
-import { useAuth } from "@/app/store/useAuth";
+import { useAuth } from "@/store/useAuth";
 import { Bubble } from "../_components/Bubble";
 
 export default function Chat() {
@@ -24,6 +20,7 @@ export default function Chat() {
   const params = useParams();
   const router = useRouter();
 
+  console.log(window.location.pathname);
   useEffect(() => {
     if (!params.id) return;
     fetchChatRoom();
@@ -81,15 +78,18 @@ export default function Chat() {
     );
     console.log(roomInfo.guests);
     const receiver = roomInfo.guests.split(",").filter((x) => x !== user.id)[0];
+    const notificationId = uuidv4();
     await addDoc(collection(firestore, "alarms", receiver, "notifications"), {
-      id: "xxx",
+      id: notificationId,
       message: `${user.name} : ${text}`,
+      redirectURL: `/chat/${roomInfo.id}`,
+      read: false,
     });
   };
 
   return (
     <main className="flex min-h-screen flex-col justify-between pt-8">
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-4 overflow-auto">
         {messages.map((message) => (
           <Bubble
             key={message.id}
@@ -99,7 +99,7 @@ export default function Chat() {
         ))}
       </div>
       <form
-        className="w-[95%] self-center h-12 rounded-full  mb-1 overflow-hidden text-white"
+        className="w-[95%] self-center h-[40px] rounded-full  mb-1 overflow-hidden text-white"
         onSubmit={async (e) => {
           e.preventDefault();
           const value = e.target[0].value;
