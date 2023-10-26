@@ -5,7 +5,7 @@ import { useAuth } from "../store/useAuth";
 import { useRouter } from "next/navigation";
 
 export const Authentication = () => {
-  const { user, signIn, signOut } = useAuth();
+  const { user, signIn, signOut, subscribeAlarm } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -13,6 +13,12 @@ export const Authentication = () => {
     if (!loggedInUser) return;
     signIn(loggedInUser);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = subscribeAlarm();
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <>

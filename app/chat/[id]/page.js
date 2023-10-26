@@ -79,9 +79,14 @@ export default function Chat() {
       collection(firestore, "chats", roomInfo.id, "messages"),
       newMessage
     );
+    console.log(roomInfo.guests);
+    const receiver = roomInfo.guests.split(",").filter((x) => x !== user.id)[0];
+    await addDoc(collection(firestore, "alarms", receiver, "notifications"), {
+      id: "xxx",
+      message: `${user.name} : ${text}`,
+    });
   };
 
-  console.log({ messages });
   return (
     <main className="flex min-h-screen flex-col justify-between pt-8">
       <div className="flex flex-col p-4">
