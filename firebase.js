@@ -6,7 +6,17 @@ import { getAuth } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+/*
+const firebaseConfig = {
+  apiKey: "AIzaSyA0FWbsJ3DHthVb7P5iaocoKupqL2vRQNU",
+  authDomain: "instagram-e828a.firebaseapp.com",
+  projectId: "instagram-e828a",
+  storageBucket: "instagram-e828a.appspot.com",
+  messagingSenderId: "69303140091",
+  appId: "1:69303140091:web:901f8db0e6c1ca0cfafa5e",
+};
+*/
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_apiKey,
   authDomain: process.env.NEXT_PUBLIC_authDomain,
