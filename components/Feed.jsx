@@ -1,11 +1,11 @@
 "use client";
 
-import { firestore } from "../../firebase";
-import { BookMark } from "../icons/BookMark";
-import { Comment } from "../icons/Comment";
-import { DM } from "../icons/DM";
-import { Heart } from "../icons/Heart";
-import { Menu } from "../icons/Menu";
+import { firestore } from "../firebase";
+import { BookMark } from "./icons/BookMark";
+import { Comment } from "./icons/Comment";
+import { DM } from "./icons/DM";
+import { Heart } from "./icons/Heart";
+import { Menu } from "./icons/Menu";
 import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
 import { useRouter } from "next/navigation";
 

@@ -8,7 +8,7 @@ import {
   doc,
 } from "@firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
-import { firestore } from "../../firebase";
+import { firestore } from "../firebase";
 import { useAuth } from "./useAuth";
 
 export const useContents = create((set, get) => ({

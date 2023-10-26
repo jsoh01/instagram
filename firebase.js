@@ -7,22 +7,13 @@ import { getAuth } from "firebase/auth";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// const firebaseConfig = {
-//   apiKey: process.env.apiKey,
-//   authDomain: process.env.authDomain,
-//   projectId: process.env.projectId,
-//   storageBucket: process.env.storageBucket,
-//   messagingSenderId: process.env.messagingSenderId,
-//   appId: process.env.appId,
-// };
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBLPq27Zf0tJ4M73KMAgGN2A7Rdlj5KojQ",
-  authDomain: "instagram-f03c5.firebaseapp.com",
-  projectId: "instagram-f03c5",
-  storageBucket: "instagram-f03c5.appspot.com",
-  messagingSenderId: "35327510641",
-  appId: "1:35327510641:web:5c09510a1a88c79db6f3d0",
+  apiKey: process.env.NEXT_PUBLIC_apiKey,
+  authDomain: process.env.NEXT_PUBLIC_authDomain,
+  projectId: process.env.NEXT_PUBLIC_projectId,
+  storageBucket: process.env.NEXT_PUBLIC_storageBucket,
+  messagingSenderId: process.env.NEXT_PUBLIC_messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_appId,
 };
 
 // Initialize Firebase

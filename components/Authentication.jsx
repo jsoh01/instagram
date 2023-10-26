@@ -16,7 +16,7 @@ export const Authentication = () => {
 
   useEffect(() => {
     if (!user) return;
-    const unsubscribe = subscribeAlarm();
+    const unsubscribe = subscribeAlarm(router);
     return () => unsubscribe();
   }, [user]);
 
