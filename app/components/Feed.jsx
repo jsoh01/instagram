@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { firestore } from "../../firebase";
 import { BookMark } from "../icons/BookMark";
 import { Comment } from "../icons/Comment";
@@ -8,6 +7,7 @@ import { DM } from "../icons/DM";
 import { Heart } from "../icons/Heart";
 import { Menu } from "../icons/Menu";
 import { doc, updateDoc, arrayRemove, arrayUnion } from "@firebase/firestore";
+import { useRouter } from "next/navigation";
 
 /**
  * User
@@ -44,8 +44,12 @@ export const Feed = ({
   content,
   onUpdateContents,
   onAddComment,
+  comments,
+  commentInputVisible,
+  getChatRoom,
 }) => {
-  const [commentInputVisible, setCommentInputVisible] = useState(false);
+  const router = useRouter();
+
   const backgroundImage =
     content.author.profileImg ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -70,7 +74,7 @@ export const Feed = ({
   };
 
   return (
-    <div className="w-[400px] bg-white mb-1">
+    <div className="w-screen sm:w-[400px] bg-white mb-1">
       <div id="header" className="flex items-center justify-between p-2">
         {/* profile */}
         <div className="flex items-center ">
@@ -90,10 +94,10 @@ export const Feed = ({
           <Menu />
         </div>
       </div>
-      <div id="content" className="w-[400px] h-[400px]">
+      <div id="content" className="w-screen sm:w-[400px] h-[400px]">
         <img
           onDoubleClick={updateHeartButtonClick}
-          className="object-cover	w-[400px] h-[400px]"
+          className="object-cover	w-screen sm:w-[400px] h-[400px]"
           src={content.image}
           alt="img"
         />
@@ -103,10 +107,18 @@ export const Feed = ({
           <button onClick={updateHeartButtonClick}>
             <Heart color={likedContent ? "red" : null} />
           </button>
-          <button onClick={() => setCommentInputVisible(!commentInputVisible)}>
+          <button onClick={() => router.push(`/detail/${content.id}`)}>
             <Comment />
           </button>
-          <DM />
+          <button
+            disabled={content.author.id === loggedInUser.id}
+            onClick={async () => {
+              const chatRoomId = await getChatRoom(content);
+              router.push(`chat/${chatRoomId}`);
+            }}
+          >
+            <DM />
+          </button>
         </div>
         <div>
           <BookMark />
@@ -121,7 +133,7 @@ export const Feed = ({
           <b>{content.author.name}</b> {content.text}
         </div>
         {/* 내가 작성한 컨텐츠의 글 */}
-        {(content.comments || []).map((comment) => (
+        {(comments || []).map((comment) => (
           <div key={comment.id}>
             <b>{comment.author.name}</b> {comment.text}
           </div>
@@ -136,7 +148,6 @@ export const Feed = ({
               if (!comment) return;
               await onAddComment(content, comment);
               e.target[0].value = "";
-              setCommentInputVisible(false);
             }}
           >
             <b>{loggedInUser.name}</b> <input />

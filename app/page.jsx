@@ -1,62 +1,29 @@
 "use client";
-import { v4 as uuidv4 } from "uuid";
 
 import { Feed } from "./components/Feed";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { collection, getDocs, setDoc, doc } from "@firebase/firestore";
-import { firestore } from "../firebase";
+import Link from "next/link";
 import { useAuth } from "./store/useAuth";
+import { useContents } from "./store/useContents";
 
 export default function Home() {
-  const [contents, setContents] = useState([]);
+  const { contents, fetchContents, updateContent, addComment, getChatRoom } =
+    useContents();
   const router = useRouter();
   const { user } = useAuth();
 
   useEffect(() => {
-    fetchFeeds();
+    fetchContents();
   }, []);
 
-  const onUpdateContents = (nextContent) => {
-    const nextContents = contents.map((content) =>
-      content.id === nextContent.id ? { ...content, ...nextContent } : content
+  if (!user) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <Link href="/auth"> 로그인을 해주세요</Link>
+      </main>
     );
-    setContents(nextContents);
-  };
-
-  const onAddComment = async (targetContent, comment) => {
-    const id = uuidv4();
-    const commentDoc = {
-      id,
-      text: comment,
-      author: user,
-    };
-    await setDoc(
-      doc(firestore, "feeds", targetContent.id, "comments", id),
-      commentDoc
-    );
-    const nextContent = {
-      ...targetContent,
-      comments: [...targetContent.comments, commentDoc],
-    };
-    onUpdateContents(nextContent);
-  };
-
-  const fetchFeeds = async () => {
-    const snapShot = await getDocs(collection(firestore, "feeds"));
-    const nextContents = [];
-    snapShot.forEach(async (doc) => {
-      const res = doc.data();
-      // res.comments = [];
-      // const commentsRef = await getDocs(
-      //   collection(firestore, "feeds", doc.id, "comments")
-      // );
-      // commentsRef.forEach((doc) => res.comments.push(doc.data()));
-      console.log({ res });
-      nextContents.push(res);
-    });
-    setContents(nextContents);
-  };
+  }
 
   return (
     <>
@@ -66,8 +33,9 @@ export default function Home() {
             key={index}
             content={content}
             loggedInUser={user}
-            onUpdateContents={onUpdateContents}
-            onAddComment={onAddComment}
+            onUpdateContents={updateContent}
+            onAddComment={addComment}
+            getChatRoom={getChatRoom}
           />
         ))}
       </main>

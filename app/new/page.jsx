@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Photo } from "../icons/Photo";
-import { firestore, storage } from "../../firebase";
+import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { setDoc, doc, collection } from "@firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 
 import { useRouter } from "next/navigation";
@@ -14,6 +13,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { useContents } from "../store/useContents";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,15 +24,13 @@ export default function New() {
   const [value, setValue] = useState();
   const router = useRouter();
   const { user } = useAuth();
-
+  const { createContent } = useContents();
   if (!user)
     return (
       <div>
         <Link href={"/auth"}> 로그인 </Link>을 해주세요
       </div>
     );
-
-  console.log({ profile: user.profileImg });
 
   const location = dayjs.tz.guess().split("/")[1];
   const backgroundImage =
@@ -109,16 +107,7 @@ export default function New() {
        bg-cover shadow-xl"
         onClick={async () => {
           try {
-            const docId = uuidv4();
-            const docRef = await setDoc(doc(firestore, "feeds", docId), {
-              id: docId,
-              author: user,
-              location,
-              image: url,
-              text: value,
-              liked: [],
-            });
-            console.log(docRef); // undefined
+            await createContent({ location, image: url, text: value });
             router.push("/"); //
           } catch (error) {
             console.error(error);
